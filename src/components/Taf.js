@@ -32,15 +32,23 @@ const Taf = ({ cat, debouncedSearchTerm }) => {
 					}
 				);
 
-				setError({ error: '', message: '' });
-				setTaf(res.data.data[0]);
-				// set cache expires 15 min
-				lscache.set(
-					'TAF-' + debouncedSearchTerm.toUpperCase(),
-					[res.data.data[0]],
-					15
-				);
-				setIsLoading(false);
+				if (res.data.data.length === 0 && debouncedSearchTerm.length === 4) {
+					setError({
+						error: 'No Airport Found',
+						message: 'Please try a different airport by ICAO, eg EGKK',
+					});
+					setIsLoading(false);
+				} else {
+					setError({ error: '', message: '' });
+					setTaf(res.data.data[0]);
+					// set cache expires 15 min
+					lscache.set(
+						'TAF-' + debouncedSearchTerm.toUpperCase(),
+						[res.data.data[0]],
+						15
+					);
+					setIsLoading(false);
+				}
 			} catch (err) {
 				setError({
 					error: `Error, ${err.response.data.error} (${err.response.status})`,
