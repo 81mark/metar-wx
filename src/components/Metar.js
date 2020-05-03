@@ -9,7 +9,6 @@ import lscache from 'lscache';
 
 const token = process.env.REACT_APP_TOKEN;
 const localAirport = 'EHAM';
-// const currentTime = new Date().getTime();
 
 const Metar = () => {
 	const [data, setData] = useState({});
@@ -19,19 +18,14 @@ const Metar = () => {
 	const [toggleMetar, setToggleMetar] = useState(false);
 
 	const debouncedSearchTerm = useDebounce(airport, 1000);
-	// No lscache here it runs 6 times
 
 	const getMetar = useCallback(async () => {
-		// Here we can put lscache GET runs once
+		// Get cache
 		let cache = lscache.get(debouncedSearchTerm.toUpperCase());
 		let noCache = false;
 
-		// console.log('cache before IF: ', cache);
-		// console.log('debounce before IF: ', debouncedSearchTerm);
 		if (cache === null) {
 			noCache = true;
-			// console.log('noCache: ', noCache);
-			// console.log('details: ', cache);
 
 			try {
 				const res = await axios.get(
@@ -62,7 +56,7 @@ const Metar = () => {
 				}
 			} catch (err) {
 				setError({
-					error: `Error, ${err.response.data.error} (${err.response.status})`,
+					error: 'Error',
 					message: 'There was an error getting the data from the server',
 				});
 				setData([]);
@@ -72,19 +66,16 @@ const Metar = () => {
 			noCache === false &&
 			cache[0].icao === debouncedSearchTerm.toUpperCase()
 		) {
-			// console.log('This is from the cache');
-			// console.log('test', cache[0]);
 			setData(cache[0]);
 			setIsLoading(false);
 		}
-	}, [debouncedSearchTerm]); // eslint-disable-line react-hooks/exhaustive-deps
+	}, [debouncedSearchTerm]);
 
 	useEffect(() => {
 		if (debouncedSearchTerm && debouncedSearchTerm.length === 4) {
 			getMetar();
 		}
-	}, [debouncedSearchTerm, getMetar]); // eslint-disable-line react-hooks/exhaustive-deps
-
+	}, [debouncedSearchTerm, getMetar]);
 	return (
 		<>
 			<Search airportSearch={(airport) => setAirport(airport)} />

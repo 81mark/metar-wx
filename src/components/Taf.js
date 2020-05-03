@@ -11,16 +11,12 @@ const Taf = ({ cat, debouncedSearchTerm }) => {
 	const [error, setError] = useState({ error: '', message: '' });
 
 	const getTaf = useCallback(async () => {
-		// Here we can put lscache GET runs once
+		// Get cache
 		let cache = lscache.get('TAF-' + debouncedSearchTerm.toUpperCase());
 		let noCache = false;
 
-		// console.log('cache before TAF IF: ', cache);
-		// console.log('debounce before TAF IF: ', debouncedSearchTerm);
 		if (cache === null) {
 			noCache = true;
-			// console.log('noCache: ', noCache);
-			// console.log('details: ', cache);
 
 			try {
 				const res = await axios.get(
@@ -34,7 +30,7 @@ const Taf = ({ cat, debouncedSearchTerm }) => {
 
 				if (res.data.data.length === 0 && debouncedSearchTerm.length === 4) {
 					setError({
-						error: 'No Airport Found',
+						error: 'No TAF or Airport Found',
 						message: 'Please try a different airport by ICAO, eg EGKK',
 					});
 					setIsLoading(false);
@@ -51,21 +47,21 @@ const Taf = ({ cat, debouncedSearchTerm }) => {
 				}
 			} catch (err) {
 				setError({
-					error: `Error, ${err.response.data.error} (${err.response.status})`,
+					error: 'Error',
 					message: 'There was an error getting the TAF data from the server',
 				});
+				console.log('error1: ', err);
+				console.log('error2: ', error.error);
 				setIsLoading(false);
 			}
 		} else if (
 			noCache === false &&
 			'TAF-' + cache[0].icao === 'TAF-' + debouncedSearchTerm.toUpperCase()
 		) {
-			// console.log('This is from the cache');
-			// console.log('test', cache[0]);
 			setTaf(cache[0]);
 			setIsLoading(false);
 		}
-	}, [debouncedSearchTerm]);
+	}, [debouncedSearchTerm, error.error]);
 
 	useEffect(() => {
 		if (debouncedSearchTerm && debouncedSearchTerm.length === 4) {
@@ -75,7 +71,13 @@ const Taf = ({ cat, debouncedSearchTerm }) => {
 
 	return (
 		<>
-			{!isLoading && !error.error && (
+			{!isLoading && error.error !== '' && (
+				<div className='alert alert-danger mt-4 mb-4 p-2'>
+					{error.error}. <br />
+					{error.message}
+				</div>
+			)}
+			{!isLoading && error.error === '' && (
 				<>
 					<div
 						className={
