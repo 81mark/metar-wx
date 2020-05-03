@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import lscache from 'lscache';
 import Search from './Search';
@@ -19,63 +19,66 @@ const Metar = () => {
 
 	const debouncedSearchTerm = useDebounce(airport, 1000);
 
-	const getMetar = useCallback(async () => {
-		// Get cache
-		let cache = lscache.get(debouncedSearchTerm.toUpperCase());
-		let noCache = false;
-
-		if (cache === null) {
-			noCache = true;
-
-			try {
-				const res = await axios.get(
-					`https://api.checkwx.com/metar/${debouncedSearchTerm}/decoded`,
-					{
-						headers: {
-							'X-API-Key': `${token}`,
-						},
-					}
-				);
-
-				if (res.data.data.length === 0 && debouncedSearchTerm.length === 4) {
-					setError({
-						error: 'No Airport Found',
-						message: 'Please try a different airport by ICAO, eg EGKK',
-					});
-					setIsLoading(false);
-				} else {
-					setError({ error: '', message: '' });
-					setData(res.data.data[0]);
-					// set cache expires 15 min
-					lscache.set(
-						debouncedSearchTerm.toUpperCase(),
-						[res.data.data[0]],
-						15
-					);
-					setIsLoading(false);
-				}
-			} catch (err) {
-				setError({
-					error: 'Error',
-					message: 'There was an error getting the data from the server',
-				});
-				setData([]);
-				setIsLoading(false);
-			}
-		} else if (
-			noCache === false &&
-			cache[0].icao === debouncedSearchTerm.toUpperCase()
-		) {
-			setData(cache[0]);
-			setIsLoading(false);
-		}
-	}, [debouncedSearchTerm]);
-
 	useEffect(() => {
 		if (debouncedSearchTerm && debouncedSearchTerm.length === 4) {
 			getMetar();
+
+			async function getMetar() {
+				// Get cache
+				let cache = lscache.get(debouncedSearchTerm.toUpperCase());
+				let noCache = false;
+
+				if (cache === null) {
+					noCache = true;
+
+					try {
+						const res = await axios.get(
+							`https://api.checkwx.com/metar/${debouncedSearchTerm}/decoded`,
+							{
+								headers: {
+									'X-API-Key': `${token}`,
+								},
+							}
+						);
+
+						if (
+							res.data.data.length === 0 &&
+							debouncedSearchTerm.length === 4
+						) {
+							setError({
+								error: 'No Airport Found',
+								message: 'Please try a different airport by ICAO, eg EGKK',
+							});
+							setIsLoading(false);
+						} else {
+							setError({ error: '', message: '' });
+							setData(res.data.data[0]);
+							// set cache expires 15 min
+							lscache.set(
+								debouncedSearchTerm.toUpperCase(),
+								[res.data.data[0]],
+								15
+							);
+							setIsLoading(false);
+						}
+					} catch (err) {
+						setError({
+							error: 'Error',
+							message: 'There was an error getting the data from the server',
+						});
+						setData([]);
+						setIsLoading(false);
+					}
+				} else if (
+					!noCache &&
+					cache[0].icao === debouncedSearchTerm.toUpperCase()
+				) {
+					setData(cache[0]);
+					setIsLoading(false);
+				}
+			}
 		}
-	}, [debouncedSearchTerm, getMetar]);
+	}, [debouncedSearchTerm]);
 
 	const cat = data.flight_category;
 
