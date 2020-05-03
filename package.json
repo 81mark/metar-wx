@@ -1,6 +1,6 @@
 {
 	"name": "weather738",
-	"version": "0.1.0",
+	"version": "1.0.0",
 	"author": "Mark Fernandez",
 	"private": true,
 	"dependencies": {
@@ -17,9 +17,7 @@
 	},
 	"scripts": {
 		"start": "react-scripts start",
-		"build": "react-scripts build",
-		"test": "react-scripts test",
-		"eject": "react-scripts eject"
+		"build": "react-scripts build"
 	},
 	"eslintConfig": {
 		"extends": "react-app"

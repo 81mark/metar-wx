@@ -6,7 +6,7 @@ const Search = ({ airportSearch }) => {
 			<input
 				id='search'
 				type='text'
-				className='form-control form-control-lg text-uppercase'
+				className='form-control form-control-lg text-uppercase pl-3'
 				placeholder='Search by Airport ICAO'
 				onChange={(e) => airportSearch(e.target.value)}
 				// eslint-disable-next-line no-undef
