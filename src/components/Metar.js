@@ -8,7 +8,7 @@ import Clouds from './Clouds';
 import Taf from './Taf';
 
 const token = process.env.REACT_APP_TOKEN;
-const localAirport = 'EHAM';
+const localAirport = 'EPWA';
 
 const Metar = () => {
 	const [data, setData] = useState({});
