@@ -17,7 +17,7 @@ const TafReport = ({ taf, cat }) => {
 					<strong> {cat}</strong>
 					<span className='float-right'> TAF</span>
 				</h5>
-				{taf.forecast.map((fc, index) => (
+				{taf.forecast?.map((fc, index) => (
 					<div key={index}>
 						{fc.timestamp.from && (
 							<>
@@ -37,7 +37,7 @@ const TafReport = ({ taf, cat }) => {
 									fc.change?.indicator.code !== 'FM' && (
 										<h5>{fc.change.indicator.text}</h5>
 									)}
-								{fc.conditions.map((condition, index) => (
+								{fc.conditions?.map((condition, index) => (
 									<p key={index}>
 										<strong>{condition.code}</strong>, expect {condition.text}.
 									</p>
